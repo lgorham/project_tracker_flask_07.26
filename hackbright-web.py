@@ -5,6 +5,17 @@ import hackbright
 app = Flask(__name__)
 
 
+@app.route("/")
+def directory_homepage():
+    """Show directory of all students and all projects"""
+
+    student_list = hackbright.get_student_body()
+    project_list = hackbright.get_all_projects()
+
+    return render_template("homepage.html",
+                            students=student_list,
+                            projects=project_list)
+
 @app.route("/student")
 def get_student():
     """Show information about a student."""
@@ -45,14 +56,25 @@ def add_database():
 
     return redirect("/student-search")
 
+
+
 @app.route("/project")
 def describe_project():
     """Gives title, description, and maximum grade of a project"""
 
     title = request.args.get('name')
     project_info = hackbright.get_project_by_title(title)
+    project_title, description, max_grade = project_info
 
-    return render_template("/projects.html", project=project_info)
+    project_grades = hackbright.get_grades_by_title(title)
+    
+
+
+    return render_template("/projects.html", 
+                            project_title=project_title, 
+                            description=description,
+                            max_grade=max_grade,
+                            grades=project_grades)
 
 
 if __name__ == "__main__":
